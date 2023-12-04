@@ -5,6 +5,7 @@ export async function GET() {
   try {
     // throw new Error("This is a test error");
     const notes = await prisma.note.findMany();
+    // console.log("NOTAS", notes);
     return NextResponse.json(notes);
     // En typescript es necesario verificar el error: Error personalizado
   } catch (error) {

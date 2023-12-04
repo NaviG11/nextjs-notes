@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/libs/prisma";
 import { Prisma } from "@prisma/client";
+import { prisma } from "@/libs/prisma";
+
 interface Params {
   params: { id: string };
 }
@@ -13,9 +14,9 @@ export async function GET(request: Request, { params }: Params) {
         id: Number(params.id),
       },
     });
-    if (!note) {
+
+    if (!note)
       return NextResponse.json({ message: "Note not found" }, { status: 404 });
-    }
 
     return NextResponse.json(note);
   } catch (error) {
@@ -31,28 +32,32 @@ export async function GET(request: Request, { params }: Params) {
     }
   }
 }
+
 export async function DELETE(request: Request, { params }: Params) {
   try {
-    const deleteNote = await prisma.note.delete({
+    const deletedNote = await prisma.note.delete({
       where: {
         id: Number(params.id),
       },
     });
-    if (!deleteNote) {
+    if (!deletedNote)
       return NextResponse.json({ message: "Note not found" }, { status: 404 });
-    }
-    return NextResponse.json(deleteNote);
+
+    return NextResponse.json(deletedNote);
   } catch (error) {
-    // Verificamos que tipo de error es recibido
-    // console.log(error);
+    console.log(error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      //   console.log(error.code, error.message);
       if (error.code === "P2025") {
         return NextResponse.json(
-          { message: "Note not found" },
-          { status: 404 }
+          {
+            message: "Note not found",
+          },
+          {
+            status: 404,
+          }
         );
       }
+
       return NextResponse.json(
         {
           message: error.message,
@@ -68,24 +73,31 @@ export async function DELETE(request: Request, { params }: Params) {
 export async function PUT(request: Request, { params }: Params) {
   try {
     const { title, content } = await request.json();
-    const updateNote = await prisma.note.update({
+
+    const updatedNote = await prisma.note.update({
       where: {
         id: Number(params.id),
       },
       data: {
-        title: title,
-        content: content,
+        title,
+        content,
       },
     });
-    return NextResponse.json(updateNote);
+
+    return NextResponse.json(updatedNote);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2025") {
         return NextResponse.json(
-          { message: "Note not found" },
-          { status: 404 }
+          {
+            message: "Note not found",
+          },
+          {
+            status: 404,
+          }
         );
       }
+
       return NextResponse.json(
         {
           message: error.message,
